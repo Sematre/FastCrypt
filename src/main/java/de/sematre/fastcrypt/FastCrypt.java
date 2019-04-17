@@ -25,10 +25,65 @@ public class FastCrypt {
 
 	/**
 	 * Generate an RSA <i>KeyPair</i> instance.
+	 * @param algorithm The key pair algorithm
+	 * @return The generated key pair
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
-	public static KeyPair generateKeyPair() {
+	public static KeyPair generateKeyPair(String algorithm) throws NoSuchAlgorithmException {
+		return KeyPairGenerator.getInstance(algorithm).generateKeyPair();
+	}
+
+	/**
+	 * Generate an <i>KeyPair</i> instance.
+	 * @param algorithm The key pair algorithm
+	 * @param keySize Size of the key pair
+	 * @return The generated key pair
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 */
+	public static KeyPair generateKeyPair(String algorithm, Integer keySize) throws NoSuchAlgorithmException {
+		KeyPairGenerator generator = KeyPairGenerator.getInstance(algorithm);
+		generator.initialize(keySize, new SecureRandom());
+		return generator.generateKeyPair();
+	}
+
+	/**
+	 * Generate an <i>KeyPair</i> instance.
+	 * @param algorithm The key pair algorithm
+	 * @param keySize Size of the key pair
+	 * @param seed The seed
+	 * @return The generated key pair
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 */
+	public static KeyPair generateKeyPair(String algorithm, Integer keySize, byte[] seed) throws NoSuchAlgorithmException {
+		KeyPairGenerator generator = KeyPairGenerator.getInstance(algorithm);
+		generator.initialize(keySize, new SecureRandom(seed));
+		return generator.generateKeyPair();
+	}
+
+	/**
+	 * Generate an <i>KeyPair</i> instance.
+	 * @param algorithm The key pair algorithm
+	 * @param keySize Size of the key pair
+	 * @param seed UTF-8 encoded seed
+	 * @return The generated key pair
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 */
+	public static KeyPair generateKeyPair(String algorithm, Integer keySize, String seed) throws NoSuchAlgorithmException {
 		try {
-			return KeyPairGenerator.getInstance("RSA").generateKeyPair();
+			return generateKeyPair(algorithm, keySize, seed.getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("Is UTF-8 supported?", e);
+		}
+	}
+
+	/**
+	 * Generate an <i>KeyPair</i> instance.
+	 * @param algorithm The key pair algorithm
+	 * @return The generated key pair
+	 */
+	public static KeyPair generateKeyPair(KeyPairAlgorithm algorithm) {
+		try {
+			return KeyPairGenerator.getInstance(algorithm.getAlgorithm()).generateKeyPair();
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 			return null;
@@ -36,12 +91,14 @@ public class FastCrypt {
 	}
 
 	/**
-	 * Generate an RSA <i>KeyPair</i> instance.
+	 * Generate an <i>KeyPair</i> instance.
+	 * @param algorithm The key pair algorithm
 	 * @param keySize Size of the key pair
+	 * @return The generated key pair
 	 */
-	public static KeyPair generateKeyPair(Integer keySize) {
+	public static KeyPair generateKeyPair(KeyPairAlgorithm algorithm, Integer keySize) {
 		try {
-			KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+			KeyPairGenerator generator = KeyPairGenerator.getInstance(algorithm.getAlgorithm());
 			generator.initialize(keySize, new SecureRandom());
 			return generator.generateKeyPair();
 		} catch (NoSuchAlgorithmException e) {
@@ -51,38 +108,40 @@ public class FastCrypt {
 	}
 
 	/**
-	 * Generate an RSA <i>KeyPair</i> instance.
+	 * Generate an <i>KeyPair</i> instance.
+	 * @param algorithm The key pair algorithm
 	 * @param keySize Size of the key pair
 	 * @param seed The seed
+	 * @return The generated key pair
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
-	public static KeyPair generateKeyPair(Integer keySize, byte[] seed) {
-		try {
-			KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-			generator.initialize(keySize, new SecureRandom(seed));
-			return generator.generateKeyPair();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-			return null;
-		}
+	public static KeyPair generateKeyPair(KeyPairAlgorithm algorithm, Integer keySize, byte[] seed) throws NoSuchAlgorithmException {
+		KeyPairGenerator generator = KeyPairGenerator.getInstance(algorithm.getAlgorithm());
+		generator.initialize(keySize, new SecureRandom(seed));
+		return generator.generateKeyPair();
 	}
 
 	/**
-	 * Generate an RSA <i>KeyPair</i> instance.
+	 * Generate an <i>KeyPair</i> instance.
+	 * @param algorithm The key pair algorithm
 	 * @param keySize Size of the key pair
 	 * @param seed UTF-8 encoded seed
+	 * @return The generated key pair
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
-	public static KeyPair generateKeyPair(Integer keySize, String seed) {
+	public static KeyPair generateKeyPair(KeyPairAlgorithm algorithm, Integer keySize, String seed) throws NoSuchAlgorithmException {
 		try {
-			return generateKeyPair(keySize, seed.getBytes("UTF-8"));
+			return generateKeyPair(algorithm, keySize, seed.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return null;
+			throw new RuntimeException("Is UTF-8 supported?", e);
 		}
 	}
 
 	/**
 	 * Generate a <i>Key</i> instance.
 	 * @param algorithm The key algorithm
+	 * @return The generated key
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
 	public static Key generateKey(String algorithm) throws NoSuchAlgorithmException {
 		KeyGenerator generator = KeyGenerator.getInstance(algorithm);
@@ -94,6 +153,8 @@ public class FastCrypt {
 	 * Generate a <i>Key</i> instance.
 	 * @param algorithm The key algorithm
 	 * @param keySize The size of the key
+	 * @return The generated key
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
 	public static Key generateKey(String algorithm, Integer keySize) throws NoSuchAlgorithmException {
 		KeyGenerator generator = KeyGenerator.getInstance(algorithm);
@@ -105,6 +166,8 @@ public class FastCrypt {
 	 * Generate a <i>Key</i> instance.
 	 * @param algorithm The key algorithm
 	 * @param seed The seed
+	 * @return The generated key
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
 	public static Key generateKey(String algorithm, byte[] seed) throws NoSuchAlgorithmException {
 		KeyGenerator generator = KeyGenerator.getInstance(algorithm);
@@ -116,13 +179,14 @@ public class FastCrypt {
 	 * Generate a <i>Key</i> instance.
 	 * @param algorithm The key algorithm
 	 * @param seed UTF-8 encoded seed
+	 * @return The generated key
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
 	public static Key generateKey(String algorithm, String seed) throws NoSuchAlgorithmException {
 		try {
 			return generateKey(algorithm, seed.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return null;
+			throw new RuntimeException("Is UTF-8 supported?", e);
 		}
 	}
 
@@ -131,6 +195,8 @@ public class FastCrypt {
 	 * @param algorithm The key algorithm
 	 * @param keySize The size of the key
 	 * @param seed The seed
+	 * @return The generated key
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
 	public static Key generateKey(String algorithm, Integer keySize, byte[] seed) throws NoSuchAlgorithmException {
 		KeyGenerator generator = KeyGenerator.getInstance(algorithm);
@@ -143,19 +209,21 @@ public class FastCrypt {
 	 * @param algorithm The key algorithm
 	 * @param keySize The size of the key
 	 * @param seed UTF-8 encoded seed
+	 * @return The generated key
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
 	public static Key generateKey(String algorithm, Integer keySize, String seed) throws NoSuchAlgorithmException {
 		try {
 			return generateKey(algorithm, keySize, seed.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return null;
+			throw new RuntimeException("Is UTF-8 supported?", e);
 		}
 	}
 
 	/**
 	 * Generate a <i>Key</i> instance.
-	 * @param algorithm The key algorithm
+	 * @param keyAlgorithm The key algorithm
+	 * @return The generated key
 	 */
 	public static Key generateKey(KeyAlgorithm keyAlgorithm) {
 		try {
@@ -168,8 +236,9 @@ public class FastCrypt {
 
 	/**
 	 * Generate a <i>Key</i> instance.
-	 * @param algorithm The key algorithm
+	 * @param keyAlgorithm The key algorithm
 	 * @param keySize The size of the key
+	 * @return The generated Key
 	 */
 	public static Key generateKey(KeyAlgorithm keyAlgorithm, Integer keySize) {
 		try {
@@ -182,8 +251,9 @@ public class FastCrypt {
 
 	/**
 	 * Generate a <i>Key</i> instance.
-	 * @param algorithm The key algorithm
+	 * @param keyAlgorithm The key algorithm
 	 * @param seed The seed
+	 * @return The generated key
 	 */
 	public static Key generateKey(KeyAlgorithm keyAlgorithm, byte[] seed) {
 		try {
@@ -196,8 +266,9 @@ public class FastCrypt {
 
 	/**
 	 * Generate a <i>Key</i> instance.
-	 * @param algorithm The key algorithm
+	 * @param keyAlgorithm The key algorithm
 	 * @param seed UTF-8 encoded seed
+	 * @return The generated key
 	 */
 	public static Key generateKey(KeyAlgorithm keyAlgorithm, String seed) {
 		try {
@@ -210,9 +281,10 @@ public class FastCrypt {
 
 	/**
 	 * Generate a <i>Key</i> instance.
-	 * @param algorithm The key algorithm
+	 * @param keyAlgorithm The key algorithm
 	 * @param keySize The size of the key
 	 * @param seed The seed
+	 * @return The generated key
 	 */
 	public static Key generateKey(KeyAlgorithm keyAlgorithm, Integer keySize, byte[] seed) {
 		try {
@@ -225,9 +297,10 @@ public class FastCrypt {
 
 	/**
 	 * Generate a <i>Key</i> instance.
-	 * @param algorithm The key algorithm
+	 * @param keyAlgorithm The key algorithm
 	 * @param keySize The size of the key
 	 * @param seed UTF-8 encoded seed
+	 * @return The generated key
 	 */
 	public static Key generateKey(KeyAlgorithm keyAlgorithm, Integer keySize, String seed) {
 		try {
@@ -243,12 +316,12 @@ public class FastCrypt {
 	 * @param cipher The cipher instance
 	 * @param object The serializable <i>Object</i>
 	 * @return The encrypted object as <i>byte[]</i>
-	 * @throws IOException
-	 * @throws InvalidKeyException
-	 * @throws IllegalBlockSizeException
-	 * @throws BadPaddingException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
+	 * @throws IOException Signals that an I/O exception of some sort has occurred. This class is the general class of exceptions produced by failed or interrupted I/O operations.
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws IllegalBlockSizeException This exception is thrown when the length of data provided to a block cipher is incorrect, i.e., does not match the block size of the cipher.
+	 * @throws BadPaddingException This exception is thrown when a particular padding mechanism is expected for the input data but the data is not padded properly.
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
 	public static byte[] encryptObject(Cipher cipher, Object object) throws IOException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
@@ -266,12 +339,12 @@ public class FastCrypt {
 	 * @param key The key instance
 	 * @param object The serializable <i>Object</i>
 	 * @return The encrypted object as <i>byte[]</i>
-	 * @throws IOException
-	 * @throws InvalidKeyException
-	 * @throws IllegalBlockSizeException
-	 * @throws BadPaddingException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
+	 * @throws IOException Signals that an I/O exception of some sort has occurred. This class is the general class of exceptions produced by failed or interrupted I/O operations.
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws IllegalBlockSizeException This exception is thrown when the length of data provided to a block cipher is incorrect, i.e., does not match the block size of the cipher.
+	 * @throws BadPaddingException This exception is thrown when a particular padding mechanism is expected for the input data but the data is not padded properly.
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
 	public static byte[] encryptObject(Key key, Object object) throws IOException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
@@ -288,11 +361,11 @@ public class FastCrypt {
 	 * Decrypts a <i>byte[]</i> into an <i>Object</i>.
 	 * @param cipher The cipher instance
 	 * @param data The encrypted data
-	 * @return The decrypted <i>byte[]</i> as <i>Object<i>
-	 * @throws IOException
-	 * @throws ClassNotFoundException
-	 * @throws BadPaddingException
-	 * @throws IllegalBlockSizeException
+	 * @return The decrypted <i>byte[]</i> as <i>Object</i>
+	 * @throws IOException Signals that an I/O exception of some sort has occurred. This class is the general class of exceptions produced by failed or interrupted I/O operations.
+	 * @throws ClassNotFoundException Thrown when an application tries to load in a class but no definition for the class with the specified name could be found.
+	 * @throws BadPaddingException This exception is thrown when a particular padding mechanism is expected for the input data but the data is not padded properly.
+	 * @throws IllegalBlockSizeException This exception is thrown when the length of data provided to a block cipher is incorrect, i.e., does not match the block size of the cipher.
 	 */
 	public static Object decryptObject(Cipher cipher, byte[] data) throws IOException, ClassNotFoundException, BadPaddingException, IllegalBlockSizeException {
 		ByteArrayInputStream byteStream = new ByteArrayInputStream(cipher.doFinal(data));
@@ -307,14 +380,14 @@ public class FastCrypt {
 	 * Decrypts a <i>byte[]</i> into an <i>Object</i>.
 	 * @param key The key instance
 	 * @param data The encrypted data
-	 * @return The decrypted <i>byte[]</i> as <i>Object<i>
-	 * @throws IOException
-	 * @throws ClassNotFoundException
-	 * @throws InvalidKeyException
-	 * @throws IllegalBlockSizeException
-	 * @throws BadPaddingException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
+	 * @return The decrypted <i>byte[]</i> as <i>Object</i>
+	 * @throws IOException Signals that an I/O exception of some sort has occurred. This class is the general class of exceptions produced by failed or interrupted I/O operations.
+	 * @throws ClassNotFoundException Thrown when an application tries to load in a class but no definition for the class with the specified name could be found.
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws IllegalBlockSizeException This exception is thrown when the length of data provided to a block cipher is incorrect, i.e., does not match the block size of the cipher.
+	 * @throws BadPaddingException This exception is thrown when a particular padding mechanism is expected for the input data but the data is not padded properly.
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
 	public static Object decryptObject(Key key, byte[] data) throws IOException, ClassNotFoundException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
 		ByteArrayInputStream byteStream = new ByteArrayInputStream(decryptData(key, data));
@@ -330,11 +403,11 @@ public class FastCrypt {
 	 * @param key The key instance
 	 * @param data The raw data
 	 * @return The encrypted <i>byte[]</i>
-	 * @throws InvalidKeyException
-	 * @throws IllegalBlockSizeException
-	 * @throws BadPaddingException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws IllegalBlockSizeException This exception is thrown when the length of data provided to a block cipher is incorrect, i.e., does not match the block size of the cipher.
+	 * @throws BadPaddingException This exception is thrown when a particular padding mechanism is expected for the input data but the data is not padded properly.
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
 	public static byte[] encryptData(Key key, byte[] data) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
 		return createEncryptCipher(key, key.getAlgorithm()).doFinal(data);
@@ -346,11 +419,11 @@ public class FastCrypt {
 	 * @param algorithm The encrypt algorithm
 	 * @param data The raw data
 	 * @return The encrypted <i>byte[]</i>
-	 * @throws InvalidKeyException
-	 * @throws IllegalBlockSizeException
-	 * @throws BadPaddingException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws IllegalBlockSizeException This exception is thrown when the length of data provided to a block cipher is incorrect, i.e., does not match the block size of the cipher.
+	 * @throws BadPaddingException This exception is thrown when a particular padding mechanism is expected for the input data but the data is not padded properly.
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
 	public static byte[] encryptData(Key key, String algorithm, byte[] data) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
 		return createEncryptCipher(key, algorithm).doFinal(data);
@@ -362,11 +435,11 @@ public class FastCrypt {
 	 * @param algorithm The encrypt algorithm
 	 * @param data The raw data
 	 * @return The encrypted <i>byte[]</i>
-	 * @throws InvalidKeyException
-	 * @throws IllegalBlockSizeException
-	 * @throws BadPaddingException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws IllegalBlockSizeException This exception is thrown when the length of data provided to a block cipher is incorrect, i.e., does not match the block size of the cipher.
+	 * @throws BadPaddingException This exception is thrown when a particular padding mechanism is expected for the input data but the data is not padded properly.
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
 	public static byte[] encryptData(Key key, CipherAlgorithm algorithm, byte[] data) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
 		return createEncryptCipher(key, algorithm).doFinal(data);
@@ -377,11 +450,11 @@ public class FastCrypt {
 	 * @param key The key instance
 	 * @param data The encrypted data
 	 * @return The decrypted <i>byte[]</i>
-	 * @throws InvalidKeyException
-	 * @throws IllegalBlockSizeException
-	 * @throws BadPaddingException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws IllegalBlockSizeException This exception is thrown when the length of data provided to a block cipher is incorrect, i.e., does not match the block size of the cipher.
+	 * @throws BadPaddingException This exception is thrown when a particular padding mechanism is expected for the input data but the data is not padded properly.
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
 	public static byte[] decryptData(Key key, byte[] data) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
 		return createDecryptCipher(key, key.getAlgorithm()).doFinal(data);
@@ -393,11 +466,11 @@ public class FastCrypt {
 	 * @param algorithm The decrypt algorithm
 	 * @param data The encrypted data
 	 * @return The decrypted <i>byte[]</i>
-	 * @throws InvalidKeyException
-	 * @throws IllegalBlockSizeException
-	 * @throws BadPaddingException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws IllegalBlockSizeException This exception is thrown when the length of data provided to a block cipher is incorrect, i.e., does not match the block size of the cipher.
+	 * @throws BadPaddingException This exception is thrown when a particular padding mechanism is expected for the input data but the data is not padded properly.
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
 	public static byte[] decryptData(Key key, String algorithm, byte[] data) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
 		return createDecryptCipher(key, algorithm).doFinal(data);
@@ -409,11 +482,11 @@ public class FastCrypt {
 	 * @param algorithm The decrypt algorithm
 	 * @param data The encrypted data
 	 * @return The decrypted <i>byte[]</i>
-	 * @throws InvalidKeyException
-	 * @throws IllegalBlockSizeException
-	 * @throws BadPaddingException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws IllegalBlockSizeException This exception is thrown when the length of data provided to a block cipher is incorrect, i.e., does not match the block size of the cipher.
+	 * @throws BadPaddingException This exception is thrown when a particular padding mechanism is expected for the input data but the data is not padded properly.
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
 	public static byte[] decryptData(Key key, CipherAlgorithm algorithm, byte[] data) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
 		return createDecryptCipher(key, algorithm).doFinal(data);
@@ -424,8 +497,8 @@ public class FastCrypt {
 	 * @param cipher The cipher instance
 	 * @param data The raw data
 	 * @return The operation result
-	 * @throws IllegalBlockSizeException
-	 * @throws BadPaddingException
+	 * @throws IllegalBlockSizeException This exception is thrown when the length of data provided to a block cipher is incorrect, i.e., does not match the block size of the cipher.
+	 * @throws BadPaddingException This exception is thrown when a particular padding mechanism is expected for the input data but the data is not padded properly.
 	 */
 	public static byte[] cipherOperation(Cipher cipher, byte[] data) throws IllegalBlockSizeException, BadPaddingException {
 		return cipher.doFinal(data);
@@ -433,7 +506,7 @@ public class FastCrypt {
 
 	/**
 	 * Hashs an <i>byte[]</i>.
-	 * @param mac The mac instance
+	 * @param mac The Mac instance
 	 * @param data The raw data
 	 * @return The hashed <i>byte[]</i>
 	 */
@@ -446,9 +519,9 @@ public class FastCrypt {
 	 * @param key The key instance
 	 * @param algorithm The algorithm
 	 * @return The cipher instance
-	 * @throws InvalidKeyException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
 	public static Cipher createEncryptCipher(Key key, String algorithm) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
 		return createCipher(Cipher.ENCRYPT_MODE, algorithm, key);
@@ -459,9 +532,9 @@ public class FastCrypt {
 	 * @param key The key instance
 	 * @param algorithm The algorithm
 	 * @return The cipher instance
-	 * @throws InvalidKeyException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
 	public static Cipher createEncryptCipher(Key key, CipherAlgorithm algorithm) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
 		return createCipher(Cipher.ENCRYPT_MODE, algorithm, key);
@@ -472,9 +545,9 @@ public class FastCrypt {
 	 * @param key The key instance
 	 * @param algorithm The algorithm
 	 * @return The cipher instance
-	 * @throws InvalidKeyException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
 	public static Cipher createDecryptCipher(Key key, String algorithm) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
 		return createCipher(Cipher.DECRYPT_MODE, algorithm, key);
@@ -485,9 +558,9 @@ public class FastCrypt {
 	 * @param key The key instance
 	 * @param algorithm The algorithm
 	 * @return The cipher instance
-	 * @throws InvalidKeyException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
 	public static Cipher createDecryptCipher(Key key, CipherAlgorithm algorithm) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
 		return createCipher(Cipher.DECRYPT_MODE, algorithm, key);
@@ -499,11 +572,11 @@ public class FastCrypt {
 	 * @param algorithm The algorithm
 	 * @param key The key instance
 	 * @return The cipher instance
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
-	 * @throws InvalidKeyException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
-	public static Cipher createCipher(Integer operation, String algorithm, Key key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
+	public static Cipher createCipher(Integer operation, String algorithm, Key key) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
 		Cipher cipher = Cipher.getInstance(algorithm);
 		cipher.init(operation, key);
 		return cipher;
@@ -515,11 +588,11 @@ public class FastCrypt {
 	 * @param algorithm The algorithm
 	 * @param key The key instance
 	 * @return The cipher instance
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
-	 * @throws InvalidKeyException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws NoSuchPaddingException This exception is thrown when a particular padding mechanism is requested but is not available in the environment.
 	 */
-	public static Cipher createCipher(Integer operation, CipherAlgorithm algorithm, Key key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
+	public static Cipher createCipher(Integer operation, CipherAlgorithm algorithm, Key key) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
 		return createCipher(operation, algorithm.getAlgorithm(), key);
 	}
 
@@ -528,10 +601,10 @@ public class FastCrypt {
 	 * @param algorithm The algorithm
 	 * @param key The key instance
 	 * @return The mac instance
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeyException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
-	public static Mac createMac(String algorithm, Key key) throws NoSuchAlgorithmException, InvalidKeyException {
+	public static Mac createMac(String algorithm, Key key) throws InvalidKeyException, NoSuchAlgorithmException {
 		Mac mac = Mac.getInstance(algorithm);
 		mac.init(key);
 		return mac;
@@ -542,10 +615,10 @@ public class FastCrypt {
 	 * @param algorithm The algorithm
 	 * @param key The key instance
 	 * @return The mac instance
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeyException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
-	public static Mac createMac(MacAlgorithm algorithm, Key key) throws NoSuchAlgorithmException, InvalidKeyException {
+	public static Mac createMac(MacAlgorithm algorithm, Key key) throws InvalidKeyException, NoSuchAlgorithmException {
 		return createMac(algorithm.getAlgorithm(), key);
 	}
 
@@ -553,10 +626,10 @@ public class FastCrypt {
 	 * Create an <i>Mac</i> instance.
 	 * @param key The key instance
 	 * @return The mac instance
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeyException
+	 * @throws InvalidKeyException This is the exception for invalid Keys (invalid encoding, wrong length, uninitialized, etc).
+	 * @throws NoSuchAlgorithmException This exception is thrown when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
-	public static Mac createMac(Key key) throws NoSuchAlgorithmException, InvalidKeyException {
+	public static Mac createMac(Key key) throws InvalidKeyException, NoSuchAlgorithmException {
 		return createMac(key.getAlgorithm(), key);
 	}
 
@@ -564,7 +637,7 @@ public class FastCrypt {
 	 * Generate an random <i>String</i>.
 	 * @param size The string length
 	 * @param allowedChars The allowed chars
-	 * @return The ganerated String
+	 * @return The generated String
 	 */
 	public static String generateRandomString(Integer size, String allowedChars) {
 		SecureRandom random = new SecureRandom();
@@ -579,7 +652,7 @@ public class FastCrypt {
 	/**
 	 * Generate an random <i>String</i>. Default chars: A-Z, a-z, 0-9
 	 * @param size The string length
-	 * @return The ganerated String
+	 * @return The generated String
 	 */
 	public static String generateRandomString(Integer size) {
 		return generateRandomString(size, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890");
@@ -704,7 +777,10 @@ public class FastCrypt {
 		HmacSHA384("HmacSHA384", false),
 		HmacSHA512("HmacSHA512", false),
 		RC2("RC2", false),
-		RC4("RC4", false);
+		RC4("RC4", false),
+		RC5("RC5", false),
+		ChaCha20("ChaCha20", false),
+		ChaCha20_Poly1305("ChaCha20-Poly1305", false);
 
 		private String algorithm = null;
 		private Boolean defaultAlgorithm = null;
@@ -725,6 +801,39 @@ public class FastCrypt {
 		public static KeyAlgorithm getKeyAlgorithm(String algorithm) {
 			for (KeyAlgorithm keyAlgorithm : values()) {
 				if (keyAlgorithm.getAlgorithm().equalsIgnoreCase(algorithm)) return keyAlgorithm;
+			}
+
+			return null;
+		}
+	}
+
+	/**
+	 * KeyPair algorithms
+	 *
+	 */
+	public enum KeyPairAlgorithm {
+
+		DiffieHellman("DiffieHellman", true), DSA("DSA", true), RSA("RSA", true), EC("EC", true);
+
+		private String algorithm = null;
+		private Boolean defaultAlgorithm = null;
+
+		private KeyPairAlgorithm(String algorithm, Boolean defaultAlgorithm) {
+			this.algorithm = algorithm;
+			this.defaultAlgorithm = defaultAlgorithm;
+		}
+
+		public String getAlgorithm() {
+			return algorithm;
+		}
+
+		public Boolean isDefaultAlgorithm() {
+			return defaultAlgorithm;
+		}
+
+		public static KeyPairAlgorithm getKeyAlgorithm(String algorithm) {
+			for (KeyPairAlgorithm keyPairAlgorithm : values()) {
+				if (keyPairAlgorithm.getAlgorithm().equalsIgnoreCase(algorithm)) return keyPairAlgorithm;
 			}
 
 			return null;
@@ -755,7 +864,10 @@ public class FastCrypt {
 		RSA_ECB_OAEPWithSHA_1_AndMGF1Padding("RSA/ECB/OAEPWITHSHA-1ANDMGF1PADDING", true),
 		RSA_ECB_OAEPWithSHA_256_AndMGF1Padding("RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING", true),
 		RC2("RC2", false),
-		RC4("RC4", false);
+		RC4("RC4", false),
+		RC5("RC5", false),
+		ChaCha20("ChaCha20", false),
+		ChaCha20_Poly1305("ChaCha20-Poly1305", false);
 
 		private String algorithm = null;
 		private Boolean defaultAlgorithm = null;

@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.zip.Adler32;
 import java.util.zip.CRC32;
 
@@ -23,7 +24,7 @@ public class FastChecksum {
 		try {
 			return crc32(data.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			return -1;
+			throw new RuntimeException("Is UTF-8 supported?", e);
 		}
 	}
 
@@ -55,7 +56,7 @@ public class FastChecksum {
 		try {
 			return crc64(data.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			return -1;
+			throw new RuntimeException("Is UTF-8 supported?", e);
 		}
 	}
 
@@ -87,7 +88,7 @@ public class FastChecksum {
 		try {
 			return adler32(data.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			return -1;
+			throw new RuntimeException("Is UTF-8 supported?", e);
 		}
 	}
 
@@ -107,6 +108,91 @@ public class FastChecksum {
 
 	public static long adler32(File file) throws IOException {
 		return adler32(new FileInputStream(file));
+	}
+
+	public static long other(ChecksumAlgorithm algorithm, byte[] data) {
+		switch (algorithm) {
+			case CRC32:
+				return crc32(data);
+
+			case CRC64:
+				return crc64(data);
+
+			case ADLER32:
+				return adler32(data);
+
+			default:
+				throw new RuntimeException("How did this happen?", new NoSuchAlgorithmException(algorithm + " is not implemented"));
+		}
+	}
+
+	public static long other(ChecksumAlgorithm algorithm, String data) {
+		try {
+			return other(algorithm, data.getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("Is UTF-8 supported?", e);
+		}
+	}
+
+	public static long other(ChecksumAlgorithm algorithm, InputStream inputStream) throws IOException {
+		InputStream bufferedStream = new BufferedInputStream(inputStream);
+		byte[] buffer = new byte[bufferSize];
+
+		long value = -1;
+		Integer available = -1;
+		switch (algorithm) {
+			case CRC32:
+				CRC32 crc32 = new CRC32();
+				while ((available = bufferedStream.read(buffer)) != -1) {
+					crc32.update(buffer, 0, available);
+				}
+
+				value = crc32.getValue();
+				break;
+
+			case CRC64:
+				CRC64 crc64 = new CRC64();
+				while ((available = bufferedStream.read(buffer)) != -1) {
+					crc64.update(buffer, 0, available);
+				}
+
+				value = crc64.getValue();
+				break;
+
+			case ADLER32:
+				Adler32 adler32 = new Adler32();
+				while ((available = bufferedStream.read(buffer)) != -1) {
+					adler32.update(buffer, 0, available);
+				}
+
+				value = adler32.getValue();
+				break;
+
+			default:
+				throw new RuntimeException("How did this happen?", new NoSuchAlgorithmException(algorithm + " is not implemented"));
+		}
+
+		bufferedStream.close();
+		return value;
+	}
+
+	public static long other(ChecksumAlgorithm algorithm, File file) throws IOException {
+		return other(algorithm, new FileInputStream(file));
+	}
+
+	public enum ChecksumAlgorithm {
+
+		CRC32(null), CRC64(null), ADLER32(null);
+
+		private Boolean defaultAlgorithm = null;
+
+		private ChecksumAlgorithm(Boolean defaultAlgorithm) {
+			this.defaultAlgorithm = defaultAlgorithm;
+		}
+
+		public Boolean isDefaultAlgorithm() {
+			return defaultAlgorithm;
+		}
 	}
 
 	public static class CRC64 {
